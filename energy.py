@@ -1,76 +1,49 @@
-import json
-import re
-from argparse import ArgumentParser
-
-import numpy as np
-from openff.toolkit.topology import Molecule, Topology
-from openmm import Context, VerletIntegrator
-from openmm.app import ForceField
-from openmmforcefields.generators import GAFFTemplateGenerator
-from simtk import unit
-from simtk.openmm import HarmonicBondForce, PeriodicTorsionForce
-from tqdm import tqdm
-
-from tito import mlops
+import openmm
+from openff.interchange import Interchange
+from openff.toolkit import ForceField, Molecule, Topology
+from openmm import unit
 
 
-def calculate_conformation_energies(
-    rd_mol, partial_charges, traj, forcefield_path="amber/protein.ff14SB.xml"
-):
-    off_mol = Molecule.from_rdkit(rd_mol)
-    off_mol.partial_charges = unit.Quantity(
-        value=np.array(partial_charges), unit=unit.elementary_charge
-    )
-    gaff = GAFFTemplateGenerator(molecules=off_mol)
-    topology = Topology.from_molecules(off_mol).to_openmm()
-    forcefield = ForceField(forcefield_path)
-    forcefield.registerTemplateGenerator(gaff.generator)
-    system = forcefield.createSystem(topology)
+def setup_butane_openmm_molecule_system():
+    force_field = ForceField("openff-2.0.0.offxml")
+    molecule = Molecule.from_smiles("C=CCCC")
+    molecule.generate_conformers(n_conformers=1)
+    molecule.assign_partial_charges("mmff94", use_conformers=molecule.conformers)
 
-    for i, force in enumerate(system.getForces()):
-        if isinstance(force, HarmonicBondForce):
-            force.setForceGroup(1)
-        elif isinstance(force, PeriodicTorsionForce):
-            force.setForceGroup(2)
+    topology = Topology.from_molecules([molecule])
+    interchange = Interchange.from_smirnoff(force_field, topology)
 
-    integrator = VerletIntegrator(
-        1.0 * unit.femtoseconds
-    )  # Minimal integrator for energy calculation
-    context = Context(system, integrator)
+    openmm_topology = interchange.to_openmm_topology()
+    openmm_system = interchange.to_openmm()
+    openmm_positions = interchange.positions.to_openmm()
+    return openmm_topology, openmm_system, openmm_positions
 
-    bond_energies = []
-    torsional_energies = []
-    total_energies = []
 
-    for conformation in traj:
-        context.setPositions(conformation)
+def evaluate_energies(openmm_topology, openmm_system, configurations):
+    time_step = 0.5 * unit.femtoseconds
+    temperature = 400 * unit.kelvin
+    friction = 1 / unit.picosecond
 
-        state_total = context.getState(getEnergy=True)
-        total_energy = state_total.getPotentialEnergy().value_in_unit(
-            unit.kilojoule / unit.mole
+    integrator = openmm.LangevinIntegrator(temperature, friction, time_step)
+
+    simulation = openmm.app.Simulation(openmm_topology, openmm_system, integrator)
+    energies = []
+    for conf in configurations:
+        simulation.context.setPositions(conf)
+        state = simulation.context.getState(getEnergy=True)
+        energy = state.getPotentialEnergy()
+        energies.append(energy)
+
+    return energies
+
+
+class EnergyEvaluator:
+    def __init__(self):
+        self.openmm_topology, self.openmm_system, self.openmm_positions = (
+            setup_butane_openmm_molecule_system()
         )
-        total_energies.append(total_energy)
 
-        state_bonds = context.getState(getEnergy=True, groups={1 << 0})
-        bond_energy = state_bonds.getPotentialEnergy().value_in_unit(
-            unit.kilojoule / unit.mole
+    def evaluate_energies(self, configurations):
+        return evaluate_energies(
+            self.openmm_topology, self.openmm_system, configurations
         )
-        bond_energies.append(bond_energy)
-
-        state_torsions = context.getState(getEnergy=True, groups={1 << 1})
-        torsional_energy = state_torsions.getPotentialEnergy().value_in_unit(
-            unit.kilojoule / unit.mole
-        )
-        torsional_energies.append(torsional_energy)
-
-    return total_energies, bond_energies, torsional_energies
-
-
-if __name__ == "__main__":
-    parser = ArgumentParser()
-    parser.add_argument("path", nargs="?", default="results/latest")
-    parser.add_argument("--re", default=".*")
-    parser.add_argument("--show", action="store_true")
-    args = parser.parse_args()
-
-    main(args)
