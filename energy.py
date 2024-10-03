@@ -43,7 +43,7 @@ class EnergyEvaluator:
             setup_butane_openmm_molecule_system()
         )
 
-    def evaluate_energies(self, configurations):
+    def evaluate(self, configurations):
         return evaluate_energies(
             self.openmm_topology, self.openmm_system, configurations
         )
