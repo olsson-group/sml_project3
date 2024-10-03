@@ -44,6 +44,7 @@ class EnergyEvaluator:
         )
 
     def evaluate(self, configurations):
-        return evaluate_energies(
+        energies = evaluate_energies(
             self.openmm_topology, self.openmm_system, configurations
         )
+        energies = np.array([energy._value for energy in energies])
