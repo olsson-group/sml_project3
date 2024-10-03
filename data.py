@@ -5,8 +5,6 @@ import numpy as np
 import torch
 import torch_geometric as geom
 
-t1 = md.load("data/trj0.pdb")
-
 
 class Pentene1Dataset(geom.data.Dataset):
     def __init__(self, data="data"):
