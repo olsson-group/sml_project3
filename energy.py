@@ -1,3 +1,4 @@
+import numpy as np
 import openmm
 from openff.interchange import Interchange
 from openff.toolkit import ForceField, Molecule, Topology
@@ -48,3 +49,4 @@ class EnergyEvaluator:
             self.openmm_topology, self.openmm_system, configurations
         )
         energies = np.array([energy._value for energy in energies])
+        return energies
