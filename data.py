@@ -13,6 +13,7 @@ class Pentene1Dataset(geom.data.Dataset):
         for f in os.listdir(data):
             if f.endswith(".pdb"):
                 traj = md.load(f"{data}/{f}")
+                traj.center_coordinates()
                 trajs.append(traj.xyz)
 
         self.atoms = torch.tensor([atom.element.number for atom in traj.top.atoms])  # type: ignore
