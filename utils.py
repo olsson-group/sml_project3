@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import torch_geometric as geom
 from torch_scatter import scatter
 
 
@@ -22,3 +23,8 @@ class Timer:
         now = datetime.now()
         time_passed = now - self.start
         return str(time_passed).split(".")[0]
+
+
+def get_example_batch(dataset, batch_size):
+    example_batch = next(iter(geom.data.DataLoader(dataset, batch_size=batch_size)))
+    return example_batch

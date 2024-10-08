@@ -5,6 +5,8 @@ import numpy as np
 import torch
 import torch_geometric as geom
 
+PENTENE_ATOMS = [6, 6, 6, 6, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+
 
 class Pentene1Dataset(geom.data.Dataset):
     def __init__(self, data="data"):
@@ -17,7 +19,7 @@ class Pentene1Dataset(geom.data.Dataset):
                 traj.center_coordinates()
                 trajs.append(traj.xyz)
 
-        self.atoms = torch.tensor([atom.element.number for atom in traj.top.atoms])  # type: ignore
+        self.atoms = torch.tensor(PENTENE_ATOMS)
         self.data = torch.tensor(np.concatenate(trajs, axis=0))
         self.edge_index = torch.tensor(
             [(i, j) for i in range(15) for j in range(15) if i != j]
