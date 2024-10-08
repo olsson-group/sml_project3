@@ -2,7 +2,7 @@ import torch
 import torch_geometric as geom
 from torchdyn.core import NeuralODE
 
-import utils
+from sml_project3 import utils
 
 
 class CFM(torch.nn.Module):
