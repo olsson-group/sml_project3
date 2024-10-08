@@ -13,11 +13,15 @@ class Pentene1Dataset(geom.data.Dataset):
         for f in os.listdir(data):
             if f.endswith(".pdb"):
                 traj = md.load(f"{data}/{f}")
+
                 traj.center_coordinates()
                 trajs.append(traj.xyz)
 
         self.atoms = torch.tensor([atom.element.number for atom in traj.top.atoms])  # type: ignore
         self.data = torch.tensor(np.concatenate(trajs, axis=0))
+        self.edge_index = torch.tensor(
+            [(i, j) for i in range(15) for j in range(15) if i != j]
+        ).T
 
     def __len__(self):
         return len(self.data)
@@ -26,9 +30,7 @@ class Pentene1Dataset(geom.data.Dataset):
         data = geom.data.Data(
             z=self.atoms,
             pos=self.data[idx],
+            edge_index=self.edge_index,
+            atom_idx=torch.arange(15),
         )
         return data
-
-
-if __name__ == "__main__":
-    ds = Pentene1Dataset()
