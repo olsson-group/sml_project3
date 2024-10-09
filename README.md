@@ -21,7 +21,11 @@ conda activate sml3_env
 jupyter notebook
 ```
 
-and solve the exercises. 
+and solve the exercises in 
+
+```bash
+sml_project3.ipynb
+```
 
 Good luck!
 
