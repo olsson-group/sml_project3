@@ -3,3 +3,4 @@ project3-template
 __pycache__
 results
 test
+.DS_Store
