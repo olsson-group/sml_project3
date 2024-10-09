@@ -1,7 +1,7 @@
-conda create --prefix ./test python=3.10 --yes
-conda activate ./test || { echo "Failed to activate environment"; exit 1; }
+conda create --prefix ./sml3_env python=3.10 --yes
+conda activate ./sml3_env || { echo "Failed to activate environment"; exit 1; }
 
-if [[ "$CONDA_PREFIX" != "$(pwd)/test" ]]; then
+if [[ "$CONDA_PREFIX" != "$(pwd)/sml3_env" ]]; then
     echo "Environment not active. Exiting to avoid installing packages in global environment."
 else
     echo "Environment is active. Proceeding with installations."
