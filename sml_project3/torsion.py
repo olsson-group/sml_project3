@@ -37,7 +37,7 @@ class TorsionEvaluator:
 
 
 if __name__ == "__main__":
-    evaluator = DihedralEvaluator()
+    evaluator = TorsionEvaluator()
     traj = np.random.rand(10, 15, 3)
     dihedrals = evaluator.evaluate(traj)
     print(dihedrals)
