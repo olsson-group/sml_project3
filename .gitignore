@@ -5,3 +5,6 @@ results
 test
 .DS_Store
 sml3_env
+oracle.ipynb
+oracle_test.ipynb
+results
