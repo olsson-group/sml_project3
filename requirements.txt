@@ -1,5 +1,5 @@
-install nglview
-install mdtraj
-install torch
-install torch_geometric
-install matplotlib
+nglview
+mdtraj
+torch
+torch_geometric
+matplotlib
