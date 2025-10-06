@@ -1,4 +1,6 @@
-Getting the environments for this weeks exercises up and running is a little challenlenging so we will be installing it using the install.sh script. Make sure to have conda installed in your environment. 
+For this project you can either choose to use Google Colab or run things locally. If you choose to use Colab you can just upload the notebook and follow the installation instructions from there. The second option is to run things locally. In that case, please follow the installation instrcutions below.
+
+Getting the environments for this weeks exercises up and running is a little challenenging so we will be installing it using the install.sh script. Make sure to have conda installed in your environment. 
 
 Start by cloning the repository
 
