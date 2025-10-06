@@ -169,30 +169,6 @@ class Update(torch.nn.Module):
         return batch
 
 
-class Readout(torch.nn.Module):
-    def __init__(self, n_features=128, n_features_out=13):
-        super().__init__()
-        self.mlp = MLP(n_features, n_features, 2 * n_features_out)
-        self.V = EquivariantLinear(n_features, n_features_out)
-        self.n_features_out = n_features_out
-
-    def forward(self, batch):
-        invariant_node_features_out, gates = torch.split(
-            self.mlp(batch.invariant_node_features), self.n_features_out, dim=-1
-        )
-
-        equivariant_node_features = self.V(batch.equivariant_node_features)
-        equivariant_node_features_out = multiply_first_dim(
-            equivariant_node_features, gates
-        )
-
-        batch.invariant_node_features = invariant_node_features_out
-        batch.equivariant_node_features = equivariant_node_features_out
-        enf = batch.equivariant_node_features
-        out = enf[:, 0, :]
-        return out
-
-
 def multiply_first_dim(w, x):
     with warnings.catch_warnings(record=True):
         return (w.T * x.T).T
