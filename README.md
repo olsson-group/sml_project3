@@ -6,15 +6,14 @@ Start by cloning the repository
 git clone https://github.com/olsson-group/sml_project3.git
 ```
 
-The install script will create an conda environment located in the sml_project3 folder. The environment is called sml3_env. 
-Here we will install jupyter notebook, nglview (needed for visualizing molecules) torch packages and openff and openmm, neeeded for calculating energies.
+The install script will create an conda environment located in the sml_project3 folder. The environment is called sml3_env. Here we will install jupyter notebook, nglview (needed for visualizing molecules) and torch packages. Run the commands below.
 
 ```bash
 cd sml_project3
 source ./install.sh
 ```
 
-After the installation is done, activate the environment and start jupyter notebook
+After the installation is done, place the notebook you downloaded from the assignment page (`sml_project3.ipynb`) at the top level of the directory. Then activate the environment and start jupyter notebook
 
 ```bash
 conda activate sml3_env
